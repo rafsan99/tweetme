@@ -7,18 +7,45 @@ This is amazing!!!!
 {% block content %} 
 Welcome to Tweetme2
 
+<div id='tweets'>
+Loading...
+</div>
+
 <script>
+const tweetsElement = document.getElementById("tweets")
+{% comment %} tweetsElement.innerHTML = "Loading..."
+
+var el1 = "<h1>HI there 1</h1>"
+var el2 = "<h1>HI there 2</h1>"
+var el3 = "<h1>HI there 3</h1>"
+tweetsElement.innerHTML = el1 + el2 + el3 {% endcomment %}
+
 const xhr = new XMLHttpRequest()
 const method = 'GET'
 const url = "/tweets"
 const responseType = "json"
+
+function fromatTweetElement(tweet) {
+    var formattedTweet = "<div class='mb-4 tweet' id='" + tweet.id + "'><p>" + tweet.content + "</p></div>"
+    return formattedTweet
+}
 
 xhr.responseType = responseType
 xhr.open(method, url)
 xhr.onload = function() {
     const serverResponse = xhr.response
     var listedItems = serverResponse.response
-    console.log(listedItems)
+    var finalTweetStr = ""
+    var i;
+    for(i=0; i<listedItems.length; i++) {
+        var tweetObj = listedItems[i] 
+        var currentItem = fromatTweetElement(tweetObj)
+        finalTweetStr += currentItem
+    }
+
+    tweetsElement.innerHTML = finalTweetStr
+    //console.log(listedItems)
+
 }
 xhr.send()
 
