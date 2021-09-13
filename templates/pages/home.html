@@ -1,10 +1,11 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% block head_title %}
-This is amazing!!!!
-{% endblock head_title %}
+this is amazing!!!!
+{% endblock head_title%}
 
-{% block content %} 
+
+{% block content %}
 
 <div class='row text-center'>
     <div class='col'>
@@ -16,18 +17,20 @@ This is amazing!!!!
     <div class='col-md-4 mx-auto col-10'>
         <form class='form' id='tweet-create-form' method='POST' action='/create-tweet'>
             {% csrf_token %}
-            <input type='hidden' value='/' name='next'/>
-            <textarea class='form-control' name='content' placeholder='Your tweet...'></textarea>
+            <input type='hidden' value='/' name='next' />
+            <textarea required='required' class='form-control' name='content' placeholder='Your tweet...'></textarea>
             <button type='submit' class='btn btn-primary'>Tweet</button>
         </form>
     </div>
 </div>
 
+
 <div class='row' id='tweets'>
-Loading...
+    Loading...
 </div>
 
 <script>
+
 
 function handleTweetCreateFormDidSubmit(event) {
     event.preventDefault()
@@ -44,41 +47,39 @@ function handleTweetCreateFormDidSubmit(event) {
     xhr.onload = function() {
         if (xhr.status === 201) {
             const newTweetJson = xhr.response
-            console.log(newTweetJson.likes)
-            const newTweetElement = fromatTweetElement(newTweet)
-            console.log(newTweetElement)
+            const newTweetElement = formatTweetElement(newTweetJson)
+            const ogHtml = tweetsContainerElement.innerHTML
+            tweetsContainerElement.innerHTML = newTweetElement + ogHtml
+            myForm.reset()
         }
+        
     }
     xhr.send(myFormData)
 }
 const tweetCreateFormEl = document.getElementById("tweet-create-form")
-tweetCreateFormEl.addEventListener("submit",handleTweetCreateFormDidSubmit)
+tweetCreateFormEl.addEventListener("submit", handleTweetCreateFormDidSubmit)
 
 
-const tweetsContainerElement = document.getElementById("tweets")
+const tweetsContainerElement = document.getElementById("tweets") 
 
 function loadTweets(tweetsElement) {
     const xhr = new XMLHttpRequest()
-    const method = 'GET'
+    const method = 'GET' 
     const url = "/tweets"
     const responseType = "json"
-
     xhr.responseType = responseType
     xhr.open(method, url)
     xhr.onload = function() {
         const serverResponse = xhr.response
-        var listedItems = serverResponse.response
+        const listedItems = serverResponse.response // array
         var finalTweetStr = ""
         var i;
-        for(i=0; i<listedItems.length; i++) {
-            var tweetObj = listedItems[i] 
-            var currentItem = fromatTweetElement(tweetObj)
+        for (i=0;i<listedItems.length; i++) {
+            var tweetObj = listedItems[i]
+            var currentItem = formatTweetElement(tweetObj)
             finalTweetStr += currentItem
         }
-
         tweetsElement.innerHTML = finalTweetStr
-        //console.log(listedItems)
-
     }
     xhr.send()
 }
@@ -88,22 +89,23 @@ loadTweets(tweetsContainerElement)
 
 function handleDidLike (tweet_id, currentCount) {
     console.log(tweet_id, currentCount)
+    return 
 }
 
 function LikeBtn(tweet) {
-    return "<button class='btn btn-primary btn-sm' onclick=handleDidLike(" + tweet.id + "," + tweet.likes + ")>" + tweet.likes + " Likes</button>"
+    return "<button class='btn btn-primary btn-sm' onclick=handleDidLike(" + 
+    tweet.id + "," + tweet.likes + ")>" + tweet.likes + " Likes</button>"
 }
 
-function fromatTweetElement(tweet) {
-    var formattedTweet = "<div class='col-12 col-md-10 mx-auto border round py-3 mb-4 tweet' id='" + tweet.id
-     + "'><p>" + tweet.content +
-     "</p><div class='btn-group'>" + LikeBtn(tweet) +
-      "</div></div>"
+function formatTweetElement(tweet) {
+    var formattedTweet = "<div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 tweet' id='tweet-" + tweet.id 
+    + "'><p>" + tweet.content + 
+        "</p><div class='btn-group'>" + LikeBtn(tweet) +
+        "</div></div>"
     return formattedTweet
 }
 
 
 
 </script>
-
 {% endblock content %}
