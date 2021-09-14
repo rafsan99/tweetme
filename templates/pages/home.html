@@ -52,7 +52,17 @@ function handleTweetCreateFormDidSubmit(event) {
             tweetsContainerElement.innerHTML = newTweetElement + ogHtml
             myForm.reset()
         }
+        else if (xhr.status === 400) {
+            const errroJson = xhr.response
+            console.log(errroJson)
+        }
+        else if (xhr.status === 500) {
+            alert("There was a server error, please try again.")
+        }
         
+    }
+    xhr.onerror = function() {
+        alert("An error occured. Please Try again later.")
     }
     xhr.send(myFormData)
 }
@@ -64,7 +74,7 @@ const tweetsContainerElement = document.getElementById("tweets")
 
 function loadTweets(tweetsElement) {
     const xhr = new XMLHttpRequest()
-    const method = 'GET' 
+    const method = 'GET' // "POST"
     const url = "/tweets"
     const responseType = "json"
     xhr.responseType = responseType
